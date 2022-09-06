@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-def main():
-    labels=pd.read_csv('./dataset_selection/labels_database.csv')
+def main(dataset):
+    labels=pd.read_csv('./dataset_selection/labels_'+dataset+'.csv')
     
     #def distance(lat1, lat2, lon1, lon2, alt1, alt2):
     #    r=6371000/180*np.pi
@@ -48,7 +48,7 @@ def main():
                 nserie+=1
                 
     selected['serie']=serie
-    selected.to_csv('./dataset_selection/selected_database.csv', index=False)
+    selected.to_csv('./dataset_selection/selected_'+dataset+'.csv', index=False)
     
     
     
@@ -61,4 +61,4 @@ def main():
     #print(sum)
     
 if __name__ == "__main__":
-    main()
+    main(dataset='night')

@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 import image
 
-def main():
+def main(dataset):
     
     database=pd.read_csv('./dataset_selection/selected_database.csv')
-    labels=pd.read_csv('./dataset_selection/labels_query.csv')
+    labels=pd.read_csv('./dataset_selection/labels_'+dataset+'.csv')
     
     #def distance(lat1, lat2, lon1, lon2, alt1, alt2):
     #    r=6371000/180*np.pi
@@ -13,19 +13,8 @@ def main():
     
     def distance(n1, n2, e1, e2, h1, h2):
         return np.sqrt((n1-n2)**2+(e1-e2)**2+(h1-h2)**2)
-    
-    
-    min_distance=0
-    
-    n=0
-    sum=0
-    tot=[]
+ 
     pdb0=database.iloc[0]
-    serie=[]
-    nserie=1
-    stop=0
-    
-    
     min_dist=1000
     start_idx=0
     
@@ -41,17 +30,29 @@ def main():
         elif dist>min_dist:
             count+=1
     
-    
+    tot=[]
+    serie=[]
+    img_index=[]
+    nserie=1
+    stop=0
+    n=0
+    sum=0
+    min_distance=0
     
     selected=pd.DataFrame(columns=labels.columns)
     
     #manually set offset (start_idx) after seeing images using image.py
-    start_idx+=10
+    start_idx+=1000
     
     
     stop_idx=labels.index.stop
-    print(start_idx)
+    
+    start_idx=10
+    nserie=1
+    
     i=start_idx
+    
+    
     
     while i < stop_idx:
         p1=labels.iloc[i-1]
@@ -66,25 +67,29 @@ def main():
             n+=1
             p0_f
             selected=selected.append(p0_f)
-            serie.append(nserie)
             sum=0
+            serie.append(nserie)
             if n==5:
-                tot.append(n) 
+                tot.append(n)
                 min_distance=10
                 n=0
                 nserie+=1
                 stop+=1
-            elif stop==10:
+            if stop==4:
+                img_index.append(i)
+            elif stop==5:
                 selected['serie']=serie
-                selected.to_csv('./dataset_selection/selected_query.csv', index=False)
+                selected.to_csv('./dataset_selection/selected_'+dataset+'.csv', index=False)
                 stop=0
-                image.plot(nserie-1)
+                print(img_index)
+                image.plot(nserie-1, img_index)
                 offset=input("Offset: ")
                 i+=int(offset)
+                img_index=[]
         i+=1
                 
     selected['serie']=serie
-    selected.to_csv('./dataset_selection/selected_query.csv', index=False)
+    selected.to_csv('./dataset_selection/selected_'+dataset+'.csv', index=False)
     
     
     
@@ -136,4 +141,4 @@ def main():
     #print(sum)
     
 if __name__ == "__main__":
-    main()
+    main(dataset='night')
