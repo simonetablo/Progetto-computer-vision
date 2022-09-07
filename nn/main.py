@@ -4,8 +4,8 @@ import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import DataLoader
 import torch.optim as optim
-import random
 from PIL import Image
+import matplotlib.pyplot as plt
 
 import my_models
 import my_datasets
@@ -58,7 +58,7 @@ if __name__=="__main__":
     criterion=nn.TripletMarginLoss(margin=margin, p=2, reduction='sum').to(device)
     optimizer=optim.Adam(model.parameters(), lr=learning_rate)
     
-    num_epoch=2
+    num_epoch=10
     train_accuracy_history=[]
     validation_accuracy_history=[]
     train_loss_history=[]
@@ -71,3 +71,20 @@ if __name__=="__main__":
         train_loss_history.append(train_loss)
         train_accuracy_history.append(train_accuracy)
         validation_accuracy_history.append(validation_accuracy)
+        
+    plt.figure(figsize=(5,3))
+    plt.plot(np.arange(1,epoch+1), train_loss_history)
+    plt.xlabel("epoch")
+    plt.ylabel("train loss")
+
+    plt.figure(figsize=(5,3))
+    plt.plot(np.arange(1,epoch+1), train_accuracy_history)
+    plt.xlabel("epoch")
+    plt.ylabel("train accuracy")
+
+    plt.figure(figsize=(5,3))
+    plt.plot(np.arange(1,epoch+1), validation_accuracy_history)
+    plt.xlabel("epoch")
+    plt.ylabel("validation accuracy")
+
+    plt.show()
