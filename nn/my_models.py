@@ -9,6 +9,8 @@ import numpy as np
 
 from PIL import Image
 
+#torch.set_default_tensor_type(torch.DoubleTensor)
+
 class seq_model(nn.Module):
     def __init__(self, ind, outd, w):
         super(seq_model, self).__init__()
@@ -19,7 +21,7 @@ class seq_model(nn.Module):
         
     def forward(self, x):
         if len(x.shape) < 3:
-            x = x.unsqueeze(1) # convert [B,C] to [B,1,C]
+            x = x.unsqueeze(1)
 
         x = x.permute(0,2,1)
         seqFt = self.conv(x)

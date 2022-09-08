@@ -2,11 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from torch.utils.data import DataLoader
-import torch.optim as optim
 
-import my_models
-import my_datasets
+
+#torch.set_default_tensor_type(torch.DoubleTensor)
 
 def train(model, batch_size, neg_per_query, device, optimizer, criterion, train_loader):
     model.train()
@@ -30,7 +28,7 @@ def train(model, batch_size, neg_per_query, device, optimizer, criterion, train_
             for n in range(neg_per_query):
                 loss += criterion(sQ[b:b+1], sP[b:b+1], sN[negidx:negidx+1])
                 dist=sum(((sQ[b:b+1] - sN[negidx:negidx+1])**2).reshape(4096))
-                if dist<=min_dist:
+                if dist<min_dist:
                     value=0
                 negidx+=1
             values.append(value)

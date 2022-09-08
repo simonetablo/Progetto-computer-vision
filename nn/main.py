@@ -4,13 +4,18 @@ import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import DataLoader
 import torch.optim as optim
+import random
 from PIL import Image
 import matplotlib.pyplot as plt
+from datetime import datetime
+
 
 import my_models
 import my_datasets
 import train
 import validation
+
+#torch.set_default_tensor_type(torch.DoubleTensor)
 
 if __name__=="__main__":
     
@@ -34,13 +39,16 @@ if __name__=="__main__":
     
     train_batch_size=16
     val_batch_size=415
+    test_batch_size=2415
     num_threads=4
         
     features_dir=''
     query='random_query.npy'
     database='random_database.npy'
+    night='random_night.npy'
     split_train=[0, 2000] #[0, 2000]
-    split_test=[2000, 2415] #[2000, 2415]
+    split_test=[2000, 2415] #[2332, 2415]
+    split_night=[0, 2415]
     neg_per_query=10
     
     #creating datasets
@@ -49,6 +57,9 @@ if __name__=="__main__":
     
     val_dataset=my_datasets.getTestDescriptors(features_dir, split_test, query, database)
     val_loader=DataLoader(dataset=val_dataset, num_workers=num_threads, batch_size=val_batch_size, shuffle=False)
+
+    test_dataset=my_datasets.getTestDescriptors(features_dir, split_night, night, database)
+    test_loader=DataLoader(dataset=test_dataset, num_workers=num_threads, batch_size=test_batch_size, shuffle=False)
     print('> datasets created.')
     
     margin=0.1
@@ -58,7 +69,9 @@ if __name__=="__main__":
     criterion=nn.TripletMarginLoss(margin=margin, p=2, reduction='sum').to(device)
     optimizer=optim.Adam(model.parameters(), lr=learning_rate)
     
-    num_epoch=10
+    num_epoch=2
+    
+    print("> Train started. %d epochs set." %num_epoch)
     train_accuracy_history=[]
     validation_accuracy_history=[]
     train_loss_history=[]
@@ -71,20 +84,28 @@ if __name__=="__main__":
         train_loss_history.append(train_loss)
         train_accuracy_history.append(train_accuracy)
         validation_accuracy_history.append(validation_accuracy)
+
+    print('> Testing model.')
+    test_accuracy=validation.validate(model, test_batch_size, device, test_loader)
+    print('TEST: accuracy: %.6f' %(test_accuracy))
+    unique=str(datetime.now())
+
+    torch.save(model.state_dict(), 'weights_E'+str(num_epoch)+'_'+unique+'.pth')
         
     plt.figure(figsize=(5,3))
-    plt.plot(np.arange(1,epoch+1), train_loss_history)
+    plt.plot(np.arange(1,num_epoch+1), train_loss_history)
     plt.xlabel("epoch")
     plt.ylabel("train loss")
 
     plt.figure(figsize=(5,3))
-    plt.plot(np.arange(1,epoch+1), train_accuracy_history)
+    plt.plot(np.arange(1,num_epoch+1), train_accuracy_history)
     plt.xlabel("epoch")
     plt.ylabel("train accuracy")
 
     plt.figure(figsize=(5,3))
-    plt.plot(np.arange(1,epoch+1), validation_accuracy_history)
+    plt.plot(np.arange(1,num_epoch+1), validation_accuracy_history)
     plt.xlabel("epoch")
     plt.ylabel("validation accuracy")
 
     plt.show()
+    
