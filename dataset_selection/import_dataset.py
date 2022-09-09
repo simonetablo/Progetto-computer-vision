@@ -12,6 +12,9 @@ def main(dataset):
     elif dataset=='database':
         str1='/media/simone/Giochi/dataset/2015-11-13-10-28-08/2015-11-13-10-28-08_stereo_centre_0'
         str2='/2015-11-13-10-28-08/stereo/centre/'
+    else:
+        str1='/home/simone/Scaricati/2014-06-25-17-02-32/2014-06-25-17-02-32_stereo_centre_0'
+        str2='/2014-06-25-17-02-32/stereo/centre/'
         
     for row in labels.index:
         string=str1+str(burst[row])+str2+str(timestamps[row])+'.png'
@@ -21,4 +24,4 @@ def main(dataset):
         immagine.save('./dataset/downsampled_'+dataset+'/'+str(timestamps[row])+'.png')
         
 if __name__ == "__main__":
-    main(dataset='database')
+    main(dataset='query_test_2')

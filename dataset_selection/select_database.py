@@ -43,7 +43,7 @@ def main(dataset):
             sum=0
             if n==5:
                 tot.append(n) 
-                min_distance=10
+                min_distance=9.5
                 n=0
                 nserie+=1
                 
@@ -61,4 +61,4 @@ def main(dataset):
     #print(sum)
     
 if __name__ == "__main__":
-    main(dataset='night')
+    main(dataset='database_test_2')

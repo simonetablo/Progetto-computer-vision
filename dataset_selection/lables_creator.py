@@ -11,4 +11,4 @@ def main(dataset):
     df.to_csv('./labels_'+dataset+'.csv', index=False)
     
 if __name__ == "__main__":
-    main(dataset='night')
+    main(dataset='query_test_2')

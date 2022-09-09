@@ -4,7 +4,7 @@ import image
 
 def main(dataset):
     
-    database=pd.read_csv('./dataset_selection/selected_database.csv')
+    database=pd.read_csv('./dataset_selection/selected_database_test_2.csv')
     labels=pd.read_csv('./dataset_selection/labels_'+dataset+'.csv')
     
     #def distance(lat1, lat2, lon1, lon2, alt1, alt2):
@@ -18,18 +18,18 @@ def main(dataset):
     min_dist=1000
     start_idx=0
     
-    #for row in labels.index:
-    #    print(row)
-    #    count=0
-    #    pq=labels.iloc[row]
-    #    dist=distance(pq.northing, pdb0.northing, pq.easting, pdb0.easting, pq.altitude, pdb0.altitude)
-    #    if dist<min_dist:
-    #        min_dist=dist
-    #        start_idx=row
-    #    elif count==5:
-    #        break
-    #    elif dist>min_dist:
-    #        count+=1
+    for row in labels.index:
+        print(row)
+        count=0
+        pq=labels.iloc[row]
+        dist=distance(pq.northing, pdb0.northing, pq.easting, pdb0.easting, pq.altitude, pdb0.altitude)
+        if dist<min_dist:
+            min_dist=dist
+            start_idx=row
+        elif count==5:
+            break
+        elif dist>min_dist:
+            count+=1
     
     tot=[]
     serie=[]
@@ -137,4 +137,4 @@ def main(dataset):
     #print(sum)
     
 if __name__ == "__main__":
-    main(dataset='night')
+    main(dataset='query_test_2')

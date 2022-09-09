@@ -84,13 +84,13 @@ def collate_fn(batch):
 def shuffle_dataset():
     query_desc_file='globalfeats_q.npy'
     database_desc_file='globalfeats_db.npy'
-    night_desc_file='globalfeats_night.npy'
+    #night_desc_file='globalfeats_night.npy'
     
-    labels=pd.read_csv('../dataset_selection/labels_test-val.csv')
+    labels=pd.read_csv('../dataset_selection/labels_db-q.csv')
     
     query_desc=np.load('./'+query_desc_file)
     database_desc=np.load('./'+database_desc_file)
-    night_desc=np.load('./'+night_desc_file)
+    #night_desc=np.load('./'+night_desc_file)
     
     if query_desc.shape[0]<database_desc.shape[0]:
         ridx=int(query_desc.shape[0]/5)
@@ -102,7 +102,7 @@ def shuffle_dataset():
     random_indices=random.sample(range(ridx), ridx)
     r_query=np.zeros((query_desc.shape[0], query_desc.shape[1]))
     r_database=np.zeros((database_desc.shape[0], database_desc.shape[1]))
-    r_night=np.zeros((night_desc.shape[0], night_desc.shape[1]))
+    #r_night=np.zeros((night_desc.shape[0], night_desc.shape[1]))
     
     r_labels=pd.DataFrame()
 
@@ -111,67 +111,13 @@ def shuffle_dataset():
         ri=random_indices[i]*5
         r_query[mi:mi+5]=query_desc[ri:ri+5]
         r_database[mi:mi+5]=database_desc[ri:ri+5]
-        r_night[mi:mi+5]=night_desc[ri:ri+5]
+        #r_night[mi:mi+5]=night_desc[ri:ri+5]
         newrow=pd.concat([labels.iloc[ri:ri+5, 5],labels.iloc[ri:ri+5, 9],labels.iloc[ri:ri+5, 0],labels.iloc[ri:ri+5, 4]], axis=1)
         r_labels=pd.concat([r_labels,newrow])
         
     np.save('random_query', r_query)
     np.save('random_database', r_database)
-    np.save('random_night', r_night)
+    #np.save('random_night', r_night)
     
     r_labels.to_csv('r_lables.csv')
 
-
-
-
-if __name__=="__main__":
-    
-    query='globalfeats_q.npy'
-    database='globalfeats_db.npy'
-    split_train=[0, 2000]
-    split_test=[2000, 2415]
-    negatives_per_query=10
-
-
-    database_desc=np.load('./'+query)
-    print(database_desc.shape)
-
-    datasettrain=getTrainDescriptors(desc_dir='', npq=negatives_per_query, split=split_train, query_desc=query, database_desc=database)
-    dataset=getTestDescriptors(desc_dir='', split=split_test, query_desc=query, database_desc=database)
-    for Data in dataset:
-        qdesc,pdesc=Data
-        print(qdesc.shape)
-        print(pdesc.shape)
-        break
-
-    #
-    #first_data=dataset[0]
-    #q, p, n, nn=first_data
-    #print('q: ',q.shape)
-    #print('p: ',p.shape)
-    #print('n: ',n.shape)
-    #
-    #print('q: ',type(q))
-    #print('p: ',type(p))
-    #print('n: ',type(n))
-    #
-    #    
-    #
-    #class getImages(Dataset):
-    #    def __init__(self, csv_file, img_dir, transform=None):
-    #        self.labels=pd.read_csv(csv_file)
-    #        self.img_dir=img_dir
-    #        self.transfrom=transform
-    #        
-    #    def __len__(self):
-    #        return len(self.lables*2)
-    #    
-    #    def __getitem__(self, idx):
-    #        mult=idx*5
-    #        query=os.path.join(self.img_dir, self.labels.iloc[mult:mult+5, 5])
-    #        positive=os.path.join(self.img_dir, self.labels.iloc[mult:mult+5, 0])
-    #
-    #        negatives=[]
-    #        for n in labels:
-    #        
-    #        return q_imgs, p_imgs, n_imgs

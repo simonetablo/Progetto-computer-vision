@@ -39,16 +39,16 @@ if __name__=="__main__":
     
     train_batch_size=16
     val_batch_size=415
-    test_batch_size=2415
+    test_batch_size=265
     num_threads=4
         
     features_dir=''
     query='random_query.npy'
     database='random_database.npy'
     night='random_night.npy'
-    split_train=[0, 2000] #[0, 2000]
-    split_test=[2000, 2415] #[2332, 2415]
-    split_night=[0, 2415]
+    split_train=[0, 2000]
+    split_test=[2000, 2400]
+    split_night=[0, 265]
     neg_per_query=10
     
     #creating datasets
@@ -62,14 +62,14 @@ if __name__=="__main__":
     test_loader=DataLoader(dataset=test_dataset, num_workers=num_threads, batch_size=test_batch_size, shuffle=False)
     print('> datasets created.')
     
-    margin=0.1
+    margin=0.01
     learning_rate=1e-3
     
     #defining loss and optimizer
     criterion=nn.TripletMarginLoss(margin=margin, p=2, reduction='sum').to(device)
     optimizer=optim.Adam(model.parameters(), lr=learning_rate)
     
-    num_epoch=2
+    num_epoch=20
     
     print("> Train started. %d epochs set." %num_epoch)
     train_accuracy_history=[]

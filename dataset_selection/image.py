@@ -42,11 +42,11 @@ import pandas as pd
 
 def main():
     img_index=[0,0,0,0,0]
-    plot(5, img_index)
+    plot(137, img_index)
     
 def plot(num, img_index):    
-    database=pd.read_csv('./dataset_selection/selected_database.csv')
-    query=pd.read_csv('./dataset_selection/selected_night.csv')
+    database=pd.read_csv('./dataset_selection/selected_database_test_2.csv')
+    query=pd.read_csv('./dataset_selection/selected_query_test_2.csv')
 
     rowsdb=database[(database.serie==num)]
     rowsq=query[(query.serie==num)]
@@ -58,26 +58,27 @@ def plot(num, img_index):
     burstq=rowsq.burst.reset_index(drop=True)
     
     
-    string='/media/simone/Giochi/dataset/2015-11-13-10-28-08/2015-11-13-10-28-08_stereo_centre_0'+str(burstdb[0])+'/2015-11-13-10-28-08/stereo/centre/'+str(timestampsdb[0])+'.png'
+    
+    string='/home/simone/Scaricati/2014-06-24-14-47-45/2014-06-24-14-47-45_stereo_centre_0'+str(burstdb[0])+'/2014-06-24-14-47-45/stereo/centre/'+str(timestampsdb[0])+'.png'
     pic1=load_image(string)
-    string='/media/simone/Giochi/dataset/2015-11-13-10-28-08/2015-11-13-10-28-08_stereo_centre_0'+str(burstdb[1])+'/2015-11-13-10-28-08/stereo/centre/'+str(timestampsdb[1])+'.png'
+    string='/home/simone/Scaricati/2014-06-24-14-47-45/2014-06-24-14-47-45_stereo_centre_0'+str(burstdb[1])+'/2014-06-24-14-47-45/stereo/centre/'+str(timestampsdb[1])+'.png'
     pic2=load_image(string)
-    string='/media/simone/Giochi/dataset/2015-11-13-10-28-08/2015-11-13-10-28-08_stereo_centre_0'+str(burstdb[2])+'/2015-11-13-10-28-08/stereo/centre/'+str(timestampsdb[2])+'.png'
+    string='/home/simone/Scaricati/2014-06-24-14-47-45/2014-06-24-14-47-45_stereo_centre_0'+str(burstdb[2])+'/2014-06-24-14-47-45/stereo/centre/'+str(timestampsdb[2])+'.png'
     pic3=load_image(string)
-    string='/media/simone/Giochi/dataset/2015-11-13-10-28-08/2015-11-13-10-28-08_stereo_centre_0'+str(burstdb[3])+'/2015-11-13-10-28-08/stereo/centre/'+str(timestampsdb[3])+'.png'
+    string='/home/simone/Scaricati/2014-06-24-14-47-45/2014-06-24-14-47-45_stereo_centre_0'+str(burstdb[3])+'/2014-06-24-14-47-45/stereo/centre/'+str(timestampsdb[3])+'.png'
     pic4=load_image(string)
-    string='/media/simone/Giochi/dataset/2015-11-13-10-28-08/2015-11-13-10-28-08_stereo_centre_0'+str(burstdb[4])+'/2015-11-13-10-28-08/stereo/centre/'+str(timestampsdb[4])+'.png'
+    string='/home/simone/Scaricati/2014-06-24-14-47-45/2014-06-24-14-47-45_stereo_centre_0'+str(burstdb[4])+'/2014-06-24-14-47-45/stereo/centre/'+str(timestampsdb[4])+'.png'
     pic5=load_image(string)
     
-    string='/media/simone/Giochi/dataset/2014-12-17-18-18-43/2014-12-17-18-18-43_stereo_centre_0'+str(burstq[0])+'/2014-12-17-18-18-43/stereo/centre/'+str(timestampsq[0])+'.png'
+    string='/home/simone/Scaricati/2014-06-25-17-02-32/2014-06-25-17-02-32_stereo_centre_0'+str(burstq[0])+'/2014-06-25-17-02-32/stereo/centre/'+str(timestampsq[0])+'.png'
     pic6=load_image(string)
-    string='/media/simone/Giochi/dataset/2014-12-17-18-18-43/2014-12-17-18-18-43_stereo_centre_0'+str(burstq[1])+'/2014-12-17-18-18-43/stereo/centre/'+str(timestampsq[1])+'.png'
+    string='/home/simone/Scaricati/2014-06-25-17-02-32/2014-06-25-17-02-32_stereo_centre_0'+str(burstq[1])+'/2014-06-25-17-02-32/stereo/centre/'+str(timestampsq[1])+'.png'
     pic7=load_image(string)
-    string='/media/simone/Giochi/dataset/2014-12-17-18-18-43/2014-12-17-18-18-43_stereo_centre_0'+str(burstq[2])+'/2014-12-17-18-18-43/stereo/centre/'+str(timestampsq[2])+'.png'
+    string='/home/simone/Scaricati/2014-06-25-17-02-32/2014-06-25-17-02-32_stereo_centre_0'+str(burstq[2])+'/2014-06-25-17-02-32/stereo/centre/'+str(timestampsq[2])+'.png'
     pic8=load_image(string)
-    string='/media/simone/Giochi/dataset/2014-12-17-18-18-43/2014-12-17-18-18-43_stereo_centre_0'+str(burstq[3])+'/2014-12-17-18-18-43/stereo/centre/'+str(timestampsq[3])+'.png'
+    string='/home/simone/Scaricati/2014-06-25-17-02-32/2014-06-25-17-02-32_stereo_centre_0'+str(burstq[3])+'/2014-06-25-17-02-32/stereo/centre/'+str(timestampsq[3])+'.png'
     pic9=load_image(string)
-    string='/media/simone/Giochi/dataset/2014-12-17-18-18-43/2014-12-17-18-18-43_stereo_centre_0'+str(burstq[4])+'/2014-12-17-18-18-43/stereo/centre/'+str(timestampsq[4])+'.png'
+    string='/home/simone/Scaricati/2014-06-25-17-02-32/2014-06-25-17-02-32_stereo_centre_0'+str(burstq[4])+'/2014-06-25-17-02-32/stereo/centre/'+str(timestampsq[4])+'.png'
     pic10=load_image(string)
     
     rows=2

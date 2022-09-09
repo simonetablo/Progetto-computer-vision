@@ -13,7 +13,6 @@ def train(model, batch_size, neg_per_query, device, optimizer, criterion, train_
     for batch_idx, data in enumerate(train_loader):
         accuracy=0
         loss=0
-        #print('batch n. ',batch_idx)
         qdesc,pdesc,ndesc,ind=data
         input=torch.cat([qdesc, pdesc, ndesc]).float()
         input=input.to(device)
