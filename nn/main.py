@@ -4,11 +4,11 @@ import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import DataLoader
 import torch.optim as optim
-import random
+import pandas as pd
 from PIL import Image
 import matplotlib.pyplot as plt
 from datetime import datetime
-
+import os
 
 import my_models
 import my_datasets
@@ -25,7 +25,7 @@ if __name__=="__main__":
     shuffle_datasets=False
     if(shuffle_datasets==True):
         my_datasets.shuffle_dataset()
-        print('> datasets shuffled.')
+        print('> datasets shuffled')
         
     #creating model
     model=nn.Module()
@@ -35,33 +35,35 @@ if __name__=="__main__":
     model.add_module('pool', nn.Sequential(*[seqmodel, flatten, L2norm]))
     #model=nn.DataParallel(model.pool)
     model.to(device)
-    print('> model created.')
+    print('> model created')
     
     train_batch_size=16
-    val_batch_size=415
-    test_batch_size=265
+    val_batch_size=400
+    test_batch_size=700
     num_threads=4
         
     features_dir=''
     query='random_query.npy'
     database='random_database.npy'
     night='random_night.npy'
-    split_train=[0, 2000]
-    split_test=[2000, 2400]
-    split_night=[0, 265]
+    query_test='globalfeats_q_test_2.npy'
+    database_test='globalfeats_db_test_2.npy'
+    #split_train=[0, 2000]
+    #split_val=[2000, 2400]
+    split_test=[0, 700]
     neg_per_query=10
     
     #creating datasets
-    train_dataset=my_datasets.getTrainDescriptors(features_dir, neg_per_query, split_train, query, database)
-    train_loader=DataLoader(dataset=train_dataset, num_workers=num_threads, batch_size=train_batch_size, collate_fn=my_datasets.collate_fn, shuffle=False)
-    
-    val_dataset=my_datasets.getTestDescriptors(features_dir, split_test, query, database)
-    val_loader=DataLoader(dataset=val_dataset, num_workers=num_threads, batch_size=val_batch_size, shuffle=False)
+    #train_dataset=my_datasets.getTrainDescriptors(features_dir, neg_per_query, split_train, query, database)
+    #train_loader=DataLoader(dataset=train_dataset, num_workers=num_threads, batch_size=train_batch_size, collate_fn=my_datasets.collate_fn, shuffle=False)
+    #
+    #val_dataset=my_datasets.getTestDescriptors(features_dir, split_val, query, database)
+    #val_loader=DataLoader(dataset=val_dataset, num_workers=num_threads, batch_size=val_batch_size, shuffle=False)
 
-    test_dataset=my_datasets.getTestDescriptors(features_dir, split_night, night, database)
+    test_dataset=my_datasets.getTestDescriptors(features_dir, split_test, query_test, database_test)
     test_loader=DataLoader(dataset=test_dataset, num_workers=num_threads, batch_size=test_batch_size, shuffle=False)
-    print('> datasets created.')
-    
+    print('> datasets created')
+
     margin=0.01
     learning_rate=1e-3
     
@@ -69,43 +71,79 @@ if __name__=="__main__":
     criterion=nn.TripletMarginLoss(margin=margin, p=2, reduction='sum').to(device)
     optimizer=optim.Adam(model.parameters(), lr=learning_rate)
     
-    num_epoch=20
-    
-    print("> Train started. %d epochs set." %num_epoch)
-    train_accuracy_history=[]
-    validation_accuracy_history=[]
-    train_loss_history=[]
-    for epoch in range(num_epoch):
-        print('> Epoch %d' %(epoch+1))
-        train_loss, train_accuracy=train.train(model, train_batch_size, neg_per_query, device, optimizer, criterion, train_loader)
-        print('TRAIN: loss: %.6f  ,  accuracy: %.6f' %(train_loss, train_accuracy))
-        validation_accuracy=validation.validate(model, val_batch_size, device, val_loader)
-        print('VALIDATION: accuracy: %.6f' %(validation_accuracy))
-        train_loss_history.append(train_loss)
-        train_accuracy_history.append(train_accuracy)
-        validation_accuracy_history.append(validation_accuracy)
+    k_fold=2
+    fold_scores=pd.DataFrame(columns=['fold', 'n.epoch', 'train_loss', 'train_accuracy', 'val_accuracy', 'val_test_accuracy'])
 
-    print('> Testing model.')
-    test_accuracy=validation.validate(model, test_batch_size, device, test_loader)
-    print('TEST: accuracy: %.6f' %(test_accuracy))
+    total_size = 2400
+    fraction = 1/k_fold
+    segment = int(total_size * fraction)
+
     unique=str(datetime.now())
-
-    torch.save(model.state_dict(), 'weights_E'+str(num_epoch)+'_'+unique+'.pth')
-        
-    plt.figure(figsize=(5,3))
-    plt.plot(np.arange(1,num_epoch+1), train_loss_history)
-    plt.xlabel("epoch")
-    plt.ylabel("train loss")
-
-    plt.figure(figsize=(5,3))
-    plt.plot(np.arange(1,num_epoch+1), train_accuracy_history)
-    plt.xlabel("epoch")
-    plt.ylabel("train accuracy")
-
-    plt.figure(figsize=(5,3))
-    plt.plot(np.arange(1,num_epoch+1), validation_accuracy_history)
-    plt.xlabel("epoch")
-    plt.ylabel("validation accuracy")
-
-    plt.show()
     
+    dir='../results/'+unique
+    os.mkdir(dir)
+    
+    for k in range(k_fold):
+        
+        print('> Fold n.'+str(k))
+        train_i00 = 0
+        train_i01 = k * segment
+        val_i0 = train_i01
+        val_i1 = k * segment + segment
+        train_i10 = val_i1
+        train_i11 = total_size
+
+        split_train=[train_i00, train_i01, train_i10, train_i11]
+        split_val=[val_i0, val_i1]        
+
+        train_dataset=my_datasets.getTrainDescriptors(features_dir, neg_per_query, split_train, query, database)
+        train_loader=DataLoader(dataset=train_dataset, num_workers=num_threads, batch_size=train_batch_size, collate_fn=my_datasets.collate_fn, shuffle=False)
+
+        val_dataset=my_datasets.getTestDescriptors(features_dir, split_val, query, database)
+        val_loader=DataLoader(dataset=val_dataset, num_workers=num_threads, batch_size=val_batch_size, shuffle=False)
+
+        num_epoch=2
+
+        print("  > Train started. %d epochs set" %num_epoch)
+        train_accuracy_history=[]
+        validation_accuracy_history=[]
+        train_loss_history=[]
+        for epoch in range(num_epoch):
+            print('  > Epoch %d' %(epoch+1))
+            train_loss, train_accuracy=train.train(model, train_batch_size, neg_per_query, device, optimizer, criterion, train_loader)
+            print('    TRAIN: loss: %.6f  ,  accuracy: %.6f' %(train_loss, train_accuracy))
+            validation_accuracy=validation.validate(model, val_batch_size, device, val_loader)
+            print('    VALIDATION: accuracy: %.6f' %(validation_accuracy))
+            train_loss_history.append(train_loss)
+            train_accuracy_history.append(train_accuracy)
+            validation_accuracy_history.append(validation_accuracy)
+
+        print(' > Testing model')
+        test_accuracy=validation.validate(model, test_batch_size, device, test_loader)
+        print('    TEST: accuracy: %.6f' %(test_accuracy))
+
+        torch.save(model.state_dict(), dir+'/weights_Kf'+str(k)+'.pth')
+
+        fold_scores.loc[k]=[k, num_epoch, train_loss, train_accuracy, validation_accuracy, test_accuracy]
+
+        r=1
+        c=3
+        fig = plt.figure(figsize=(30, 10), tight_layout=True)
+        fig.add_subplot(r,c,1)
+        plt.plot(np.arange(1,num_epoch+1), train_loss_history)
+        plt.xlabel("epoch")
+        plt.ylabel("train loss")
+        
+
+        fig.add_subplot(r,c,2)
+        plt.plot(np.arange(1,num_epoch+1), train_accuracy_history)
+        plt.xlabel("epoch")
+        plt.ylabel("train accuracy")
+
+        fig.add_subplot(r,c,3)
+        plt.plot(np.arange(1,num_epoch+1), validation_accuracy_history)
+        plt.xlabel("epoch")
+        plt.ylabel("validation accuracy")
+
+        fig.savefig(dir+'/plots_Kf'+str(k)+'.png')
+    fold_scores.to_csv(dir+'/scores.csv')
