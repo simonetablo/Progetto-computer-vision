@@ -28,14 +28,7 @@ if __name__=="__main__":
         print('> datasets shuffled')
         
     #creating model
-    model=nn.Module()
-    seqmodel=my_models.seq_model(4096, 4096, 5)
-    flatten=my_models.Flatten()
-    L2norm=my_models.L2Norm()
-    model.add_module('pool', nn.Sequential(*[seqmodel, flatten, L2norm]))
-    #model=nn.DataParallel(model.pool)
-    model.to(device)
-    print('> model created')
+
     
     train_batch_size=16
     val_batch_size=400
@@ -62,17 +55,12 @@ if __name__=="__main__":
 
     test_dataset=my_datasets.getTestDescriptors(features_dir, split_test, query_test, database_test)
     test_loader=DataLoader(dataset=test_dataset, num_workers=num_threads, batch_size=test_batch_size, shuffle=False)
-    print('> datasets created')
 
-    margin=0.01
-    learning_rate=1e-3
+    margin=1
+    learning_rate=1e-4
     
-    #defining loss and optimizer
-    criterion=nn.TripletMarginLoss(margin=margin, p=2, reduction='sum').to(device)
-    optimizer=optim.Adam(model.parameters(), lr=learning_rate)
-    
-    k_fold=2
-    fold_scores=pd.DataFrame(columns=['fold', 'n.epoch', 'train_loss', 'train_accuracy', 'val_accuracy', 'val_test_accuracy'])
+    k_fold=6
+    fold_scores=pd.DataFrame(columns=['fold', 'n.epoch', 'train_loss', 'train_accuracy', 'val_accuracy', 'test_accuracy', 't.l.margin', 'learning_reate', 'NpQ'])
 
     total_size = 2400
     fraction = 1/k_fold
@@ -84,8 +72,18 @@ if __name__=="__main__":
     os.mkdir(dir)
     
     for k in range(k_fold):
+
+        print('> Fold n.'+str(k+1))
         
-        print('> Fold n.'+str(k))
+        model=nn.Module()
+        seqmodel=my_models.seq_model(4096, 4096, 5)
+        flatten=my_models.Flatten()
+        L2norm=my_models.L2Norm()
+        model.add_module('pool', nn.Sequential(*[seqmodel, flatten, L2norm]))
+        #model=nn.DataParallel(model.pool)
+        model.to(device)
+        print(' model created')
+
         train_i00 = 0
         train_i01 = k * segment
         val_i0 = train_i01
@@ -102,9 +100,16 @@ if __name__=="__main__":
         val_dataset=my_datasets.getTestDescriptors(features_dir, split_val, query, database)
         val_loader=DataLoader(dataset=val_dataset, num_workers=num_threads, batch_size=val_batch_size, shuffle=False)
 
-        num_epoch=2
+        print(' datasets created')
 
-        print("  > Train started. %d epochs set" %num_epoch)
+
+        #defining loss and optimizer
+        criterion=nn.TripletMarginLoss(margin=margin, p=2, reduction='sum').to(device)
+        optimizer=optim.Adam(model.parameters(), lr=learning_rate)
+    
+        num_epoch=30
+
+        print(" > Train started. %d epochs set" %num_epoch)
         train_accuracy_history=[]
         validation_accuracy_history=[]
         train_loss_history=[]
@@ -124,7 +129,7 @@ if __name__=="__main__":
 
         torch.save(model.state_dict(), dir+'/weights_Kf'+str(k)+'.pth')
 
-        fold_scores.loc[k]=[k, num_epoch, train_loss, train_accuracy, validation_accuracy, test_accuracy]
+        fold_scores.loc[k]=[k, num_epoch, train_loss, train_accuracy, validation_accuracy, test_accuracy, margin, learning_rate, neg_per_query]
 
         r=1
         c=3
