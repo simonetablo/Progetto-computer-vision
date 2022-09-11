@@ -26,8 +26,6 @@ if __name__=="__main__":
     if(shuffle_datasets==True):
         my_datasets.shuffle_dataset()
         print('> datasets shuffled')
-        
-    #creating model
 
     
     train_batch_size=16
@@ -38,12 +36,15 @@ if __name__=="__main__":
     features_dir=''
     query='random_query.npy'
     database='random_database.npy'
+    snow='random_snow.npy'
     night='random_night.npy'
     query_test='globalfeats_q_test_2.npy'
     database_test='globalfeats_db_test_2.npy'
     #split_train=[0, 2000]
     #split_val=[2000, 2400]
     split_test=[0, 700]
+
+    pos_per_query=2
     neg_per_query=10
     
     #creating datasets
@@ -94,7 +95,7 @@ if __name__=="__main__":
         split_train=[train_i00, train_i01, train_i10, train_i11]
         split_val=[val_i0, val_i1]        
 
-        train_dataset=my_datasets.getTrainDescriptors(features_dir, neg_per_query, split_train, query, database)
+        train_dataset=my_datasets.getTrainDescriptors(features_dir, neg_per_query, split_train, query, database, snow)
         train_loader=DataLoader(dataset=train_dataset, num_workers=num_threads, batch_size=train_batch_size, collate_fn=my_datasets.collate_fn, shuffle=False)
 
         val_dataset=my_datasets.getTestDescriptors(features_dir, split_val, query, database)
@@ -115,7 +116,7 @@ if __name__=="__main__":
         train_loss_history=[]
         for epoch in range(num_epoch):
             print('  > Epoch %d' %(epoch+1))
-            train_loss, train_accuracy=train.train(model, train_batch_size, neg_per_query, device, optimizer, criterion, train_loader)
+            train_loss, train_accuracy=train.train(model, train_batch_size, pos_per_query, neg_per_query, device, optimizer, criterion, train_loader)
             print('    TRAIN: loss: %.6f  ,  accuracy: %.6f' %(train_loss, train_accuracy))
             validation_accuracy=validation.validate(model, val_batch_size, device, val_loader)
             print('    VALIDATION: accuracy: %.6f' %(validation_accuracy))

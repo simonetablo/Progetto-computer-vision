@@ -18,19 +18,19 @@ def main(dataset):
     min_dist=1000
     start_idx=0
     
-    for row in labels.index:
-        print(row)
-        count=0
-        pq=labels.iloc[row]
-        dist=distance(pq.northing, pdb0.northing, pq.easting, pdb0.easting, pq.altitude, pdb0.altitude)
-        if dist<min_dist:
-            min_dist=dist
-            start_idx=row
-        elif count==5:
-            break
-        elif dist>min_dist:
-            count+=1
-    
+    #for row in labels.index:
+    #    print(row)
+    #    count=0
+    #    pq=labels.iloc[row]
+    #    dist=distance(pq.northing, pdb0.northing, pq.easting, pdb0.easting, pq.altitude, pdb0.altitude)
+    #    if dist<min_dist:
+    #        min_dist=dist
+    #        start_idx=row
+    #    elif count==5:
+    #        break
+    #    elif dist>min_dist:
+    #        count+=1
+    #
     tot=[]
     serie=[]
     img_index=[]
@@ -43,7 +43,7 @@ def main(dataset):
     selected=pd.DataFrame(columns=labels.columns)
     
     #manually set offset (start_idx) after seeing images using image.py
-    start_idx+=0
+    start_idx+=235
     
     
     stop_idx=labels.index.stop
@@ -137,4 +137,4 @@ def main(dataset):
     #print(sum)
     
 if __name__ == "__main__":
-    main(dataset='query_test_2')
+    main(dataset='database_snow')

@@ -42,7 +42,7 @@ def main(dataset):
     selected=pd.DataFrame(columns=labels.columns)
     
     #manually set offset (start_idx) after seeing images using image.py
-    start_idx+=1000
+    start_idx+=0
     
     
     stop_idx=labels.index.stop
@@ -141,4 +141,4 @@ def main(dataset):
     #print(sum)
     
 if __name__ == "__main__":
-    main(dataset='night')
+    main(dataset='database_snow')

@@ -2,11 +2,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import time
 
 
 #torch.set_default_tensor_type(torch.DoubleTensor)
 
-def train(model, batch_size, neg_per_query, device, optimizer, criterion, train_loader):
+def train(model, batch_size, pos_per_query, neg_per_query, device, optimizer, criterion, train_loader):
     model.train()
     epoch_loss=0
     epoch_accuracy=0
@@ -18,24 +19,25 @@ def train(model, batch_size, neg_per_query, device, optimizer, criterion, train_
         input=input.to(device)
         optimizer.zero_grad()
         results=model.pool(input)
-        sQ, sP, sN=torch.split(results, [batch_size, batch_size, neg_per_query*batch_size])
+        sQ, sP, sN=torch.split(results, [batch_size, pos_per_query*batch_size, neg_per_query*batch_size])
         values=[]
-        negidx=0
-        for b in range(batch_size):
-            min_dist=sum(((sQ[b:b+1] - sP[b:b+1])**2).reshape(4096))
+        for b in range(batch_size*pos_per_query):
+            c=b
+            if(b>=batch_size):
+                c-=batch_size
+            min_dist=sum(((sQ[c:c+1] - sP[b:b+1])**2).reshape(4096))
             value=1
             for n in range(neg_per_query):
-                loss += criterion(sQ[b:b+1], sP[b:b+1], sN[negidx:negidx+1])
-                dist=sum(((sQ[b:b+1] - sN[negidx:negidx+1])**2).reshape(4096))
+                loss += criterion(sQ[c:c+1], sP[b:b+1], sN[10*c+n:10*c+n+1])
+                dist=sum(((sQ[c:c+1] - sN[10*c+n:10*c+n+1])**2).reshape(4096))
                 if dist<min_dist:
                     value=0
-                negidx+=1
             values.append(value)
-        loss /= torch.tensor(batch_size*neg_per_query).float().to(device)
+        loss /= torch.tensor(batch_size*pos_per_query*neg_per_query).float().to(device)
         loss.backward()
         optimizer.step()
         epoch_loss+=loss.item()
-        accuracy=sum(values)/batch_size
+        accuracy=sum(values)/(batch_size*pos_per_query)
         epoch_accuracy+=accuracy
     epoch_accuracy/=len(train_loader)
     return(epoch_loss, epoch_accuracy)
