@@ -24,7 +24,6 @@ class getTrainDescriptors(Dataset):
         self.query_desc=np.concatenate((query_desc1, query_desc2), axis=0)
         self.database_desc=np.concatenate((database_desc1, database_desc2), axis=0)
         self.database2_desc=np.concatenate((database2_desc1, database2_desc2), axis=0)
-        print(self.database2_desc.shape)
         
     def __len__(self):
         return int(len(self.database_desc)/5)
@@ -39,8 +38,7 @@ class getTrainDescriptors(Dataset):
         indices.append(idx)
         indices.append(idx)
         indices.append(idx)
-        all_n_desc=np.concatenate((self.database_desc[:idx],self.database_desc[idx+5:]),self.database2_desc[:idx],self.database2_desc[idx+5:])
-        print(all_n_desc.shape)
+        all_n_desc=np.concatenate((self.database_desc[:idx],self.database_desc[idx+5:],self.database2_desc[:idx],self.database2_desc[idx+5:]))
         n_idx=np.full((self.npq),idx)
         while idx>-1:
             if idx in n_idx:
@@ -100,8 +98,8 @@ def shuffle_dataset():
     night_desc_file='globalfeats_night.npy'
     snow_desc_file='globalfeats_snow.npy'
     
-    #labels=pd.read_csv('../dataset_selection/labels_test-val.csv')
-    
+    all_labels=pd.read_csv('../dataset_selection/all_labels.csv')
+
     query_desc=np.load('./'+query_desc_file)
     database_desc=np.load('./'+database_desc_file)
     night_desc=np.load('./'+night_desc_file)
@@ -120,7 +118,7 @@ def shuffle_dataset():
     r_night=np.zeros((night_desc.shape[0], night_desc.shape[1]))
     r_snow=np.zeros((snow_desc.shape[0], snow_desc.shape[1]))
     
-    r_labels=pd.DataFrame()
+    r_labels=pd.DataFrame(columns=['q_timestamp','db_timestamp','snow_timestamp','night_timestamp','serie','new_serie'])
 
     for i in range(ridx):
         mi=i*5
@@ -129,15 +127,15 @@ def shuffle_dataset():
         r_database[mi:mi+5]=database_desc[ri:ri+5]
         r_night[mi:mi+5]=night_desc[ri:ri+5]
         r_snow[mi:mi+5]=snow_desc[ri:ri+5]
-        #newrow=pd.concat([labels.iloc[ri:ri+5, 5],labels.iloc[ri:ri+5, 9],labels.iloc[ri:ri+5, 0],labels.iloc[ri:ri+5, 4]], axis=1)
-        #r_labels=pd.concat([r_labels,newrow])
+        ns=[i,i,i,i,i]
+        r_labels=pd.concat([r_labels,all_labels[ri:ri+5]], ignore_index=True)
         
     np.save('random_query', r_query)
     np.save('random_database', r_database)
     np.save('random_night', r_night)
     np.save('random_snow', r_snow)
     
-    #r_labels.to_csv('r_lables.csv')
+    r_labels.to_csv('random_labels.csv')
 
 
 

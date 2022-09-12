@@ -118,15 +118,17 @@ if __name__=="__main__":
             print('  > Epoch %d' %(epoch+1))
             train_loss, train_accuracy=train.train(model, train_batch_size, pos_per_query, neg_per_query, device, optimizer, criterion, train_loader)
             print('    TRAIN: loss: %.6f  ,  accuracy: %.6f' %(train_loss, train_accuracy))
-            validation_accuracy=validation.validate(model, val_batch_size, device, val_loader)
+            validation_accuracy, validation_results=validation.validate(model, val_batch_size, device, val_loader)
             print('    VALIDATION: accuracy: %.6f' %(validation_accuracy))
+            validation_results.to_csv(dir+'/validation_results_F'+str(k)+'_E'+str(epoch)+'.csv')
             train_loss_history.append(train_loss)
             train_accuracy_history.append(train_accuracy)
             validation_accuracy_history.append(validation_accuracy)
 
         print(' > Testing model')
-        test_accuracy=validation.validate(model, test_batch_size, device, test_loader)
+        test_accuracy, test_results=validation.validate(model, test_batch_size, device, test_loader)
         print('    TEST: accuracy: %.6f' %(test_accuracy))
+        test_results.to_csv(dir+'/test_results_F'+str(k)+'.csv')
 
         torch.save(model.state_dict(), dir+'/weights_Kf'+str(k)+'.pth')
 

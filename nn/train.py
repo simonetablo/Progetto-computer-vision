@@ -18,8 +18,8 @@ def train(model, batch_size, pos_per_query, neg_per_query, device, optimizer, cr
         input=torch.cat([qdesc, pdesc, ndesc]).float()
         input=input.to(device)
         optimizer.zero_grad()
-        results=model.pool(input)
-        sQ, sP, sN=torch.split(results, [batch_size, pos_per_query*batch_size, neg_per_query*batch_size])
+        output=model.pool(input)
+        sQ, sP, sN=torch.split(output, [batch_size, pos_per_query*batch_size, neg_per_query*batch_size])
         values=[]
         for b in range(batch_size*pos_per_query):
             c=b

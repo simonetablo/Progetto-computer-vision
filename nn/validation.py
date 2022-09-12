@@ -9,6 +9,7 @@ def validate(model, batch_size, device, val_loader):
     model.eval()
     epoch_accuracy=0
     cpu=torch.device('cpu')
+    results=pd.DataFrame(columns=['query','positive'])
     for batch_idx, data in enumerate(val_loader):
         accuracy=0
         q, db=data
@@ -16,8 +17,8 @@ def validate(model, batch_size, device, val_loader):
         dbidx=db.shape[0]
         input=torch.cat([q, db]).float()
         input=input.to(device)
-        results=model.pool(input)
-        sQ, sDB=torch.split(results, [qidx, dbidx])
+        output=model.pool(input)
+        sQ, sDB=torch.split(output, [qidx, dbidx])
         sQ=sQ.to(cpu, dtype=torch.float64)
         sDB=sDB.to(cpu, dtype=torch.float64)
         values=[]
@@ -34,6 +35,7 @@ def validate(model, batch_size, device, val_loader):
             if(res>0):
                 value=0
             values.append(value)
+            results.loc[k]=[k, int(torch.argmin(npfin))]
         accuracy=sum(values)/qidx
         epoch_accuracy+=accuracy
-    return epoch_accuracy
+    return epoch_accuracy, results
