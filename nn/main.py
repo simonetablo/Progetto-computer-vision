@@ -38,8 +38,10 @@ if __name__=="__main__":
     database='random_database.npy'
     snow='random_snow.npy'
     night='random_night.npy'
-    query_test='globalfeats_q_test_2.npy'
-    database_test='globalfeats_db_test_2.npy'
+    query_test='globalfeats_q_test.npy'
+    database_test='globalfeats_db_test.npy'
+    query_test_2='globalfeats_q_test_2.npy'
+    database_test_2='globalfeats_db_test_2.npy'
     #split_train=[0, 2000]
     #split_val=[2000, 2400]
     split_test=[0, 700]
@@ -58,7 +60,7 @@ if __name__=="__main__":
     test_loader=DataLoader(dataset=test_dataset, num_workers=num_threads, batch_size=test_batch_size, shuffle=False)
 
     margin=1
-    learning_rate=1e-4
+    learning_rate=1e-5
     
     k_fold=6
     fold_scores=pd.DataFrame(columns=['fold', 'n.epoch', 'train_loss', 'train_accuracy', 'val_accuracy', 'test_accuracy', 't.l.margin', 'learning_reate', 'NpQ'])
@@ -108,7 +110,7 @@ if __name__=="__main__":
         criterion=nn.TripletMarginLoss(margin=margin, p=2, reduction='sum').to(device)
         optimizer=optim.Adam(model.parameters(), lr=learning_rate)
     
-        num_epoch=30
+        num_epoch=10
 
         print(" > Train started. %d epochs set" %num_epoch)
         train_accuracy_history=[]
