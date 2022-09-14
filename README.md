@@ -17,6 +17,7 @@ Nella fase di train il relativo subset viene caricato dal dataloader nella segue
 - **1 Query**, prelevata dal query set  
 - **2 Positives**, prelevate dal database set e corrispondenti alla medesima porzione di tragitto della query
 - **10 Negatives**, prelevate casualmente dal database set
+
 Il tensore così formato viene quindi passato all'interno di una rete neurale convoluzionale che mediante una *1D-convolution* ne ricava un descrittore unico per ogni serie (ovvero un tensore *(1x4096)*), che viene poi normalizzato con una *L2-normalization*. La rete è allenata utilizzando come loss function la *triplet loss*, calcolata su ogni combinazione di query, positivo e negativo, e come optimizer l'algoritmo *Adam*.  
 Per la fase di validation vengono poi caricati nella rete tutti i descrittori di query e database presenti nel validation set e calcolata l'accuracy mediante distanza euclidea tra i descrittori globali di ogni serie di immagini restituiti dalla cnn.  
 Training e validation viene ripetuto per *n* epoche per poi passare alla fase di test, sostanzialmente identica a quella di validation ma con query e database differenti.  
