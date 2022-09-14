@@ -26,7 +26,7 @@ Tutte le fasi appena descritte sono inserite all'interno di un ciclo di *k-fold 
 
 Di seguito vengono riportati alcuni dei risultati ottenuti, comprendenti i grafici di train loss, train accuracy e validation accuracy di una fold e la tabella con i principali valori e parametri dell'allenamento.  
 
-![grafico1](results/2022-09-12 11_21_57.896632/plots_Kf2.png)
+![grafico1](grafico1.png)
 
 |fold|n.epoch|      train loss    |train accuracy|val accuracy|  test accuracy   |t.l. margin|learning reate|NpQ|
 |----|-------|--------------------|--------------|------------|------------------|-----------|--------------|---|
@@ -37,7 +37,7 @@ Di seguito vengono riportati alcuni dei risultati ottenuti, comprendenti i grafi
 | 4  |  30   |0.013409430876890838|    0.98625   |   0.9      |0.75              |   0.1     |    1e-05     |10 |
 | 5  |  30   |0.007473285395917628|    0.99125   |   0.9125   |0.7785714285714286|   0.1     |    1e-05     |10 |
 
-![grafico2](results/2022-09-13 02_22_45.060620/plots_Kf1.png){: width=1850 }
+![grafico2](grafico2.png)
 
 |fold|n.epoch|     train_loss     |train accuracy|val accuracy|  test accuracy   |t.l. margin|learning reate|NpQ|
 |----|-------|--------------------|--------------|------------|------------------|-----------|--------------|---|
@@ -48,7 +48,7 @@ Di seguito vengono riportati alcuni dei risultati ottenuti, comprendenti i grafi
 | 4  |  20   |0.006053468538084417|    0.96875   |   0.9375   |0.7357142857142858|   0.01    |    1e-05     |10 |
 | 5  |  20   |0.007795752151650959|    0.96125   |   0.95     |0.7785714285714286|   0.01    |    1e-05     |10 |
 
-![grafico3](results/2022-09-12 11:52:52.896180/plots_Kf1.png){: width=1850 }
+![grafico3](grafico3.png)
 
 |fold|n.epoch|train_loss          |train_accuracy|val_accuracy|test_accuracy     |t.l.margin|learning_reate|NpQ|
 |----|-------|--------------------|--------------|------------|------------------|----------|--------------|---|
